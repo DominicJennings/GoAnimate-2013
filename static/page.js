@@ -62,12 +62,12 @@ module.exports = function (req, res, url) {
 					storePath: process.env.STORE_URL + "/<store>",
 					clientThemePath: process.env.CLIENT_URL + "/<client_theme>",
 					original_asset_id: query["id"] || null,
-					themeId: "family",
+					themeId: "custom",
 					ut: 60,
-					bs: "adam",
+					bs: "default",
 					appCode: "go",
 					page: "",
-					siteId: "0",
+					siteId: "go",
 					m_mode: "school",
 					isLogin: "Y",
 					isEmbed: 1,
@@ -99,7 +99,7 @@ module.exports = function (req, res, url) {
 					ut: 60,
 					appCode: "go",
 					page: "",
-					siteId: "0",
+					siteId: "go",
 					m_mode: "school",
 					isLogin: "Y",
 					isEmbed: 1,
@@ -142,16 +142,107 @@ module.exports = function (req, res, url) {
 					isLogin: "Y",
 					retut: 0,
 					clientThemePath: process.env.CLIENT_URL + "/<client_theme>",
-					themeColor: "silver",
-					themeId: "retro",
-					tray: "retro",
+					themeId: "custom",
+					tray: "custom",
 					tlang: "en_US",
 					presaveId: presave,
 					goteam_draft_only: 0,
 					isWide: 1,
 					collab: 0,
 					movieLid: 10,
-			                has_asset_char: "0",
+			                has_asset_char: "1",
+					nextUrl: "/html/list/movies.html",
+					tutorial: 1,
+				},
+				allowScriptAccess: "always",
+			};
+			break;
+		}
+
+		case "/videomaker/full/custom": {
+			let presave =
+				query.movieId && query.movieId.startsWith("m")
+					? query.movieId
+					: `m-${fUtil[query.noAutosave ? "getNextFileId" : "fillNextFileId"]("movie-", ".xml")}`;
+			title = "Video Editor";
+			attrs = {
+				data: process.env.SWF_URL + "/go_full.swf",
+				type: "application/x-shockwave-flash",
+				width: "100%",
+				height: "100%",
+			};
+			params = {
+				flashvars: {
+					apiserver: "/",
+					storePath: process.env.STORE_URL + "/<store>",
+					isEmbed: 1,
+					ctc: "go",
+					ut: 30,
+					bs: "default",
+					userId: 2152,
+			                m_mode: "Y",
+					appCode: "go",
+					page: "",
+					siteId: "go",
+					lid: 13,
+					isLogin: "Y",
+					retut: 0,
+					clientThemePath: process.env.CLIENT_URL + "/<client_theme>",
+					themeId: "custom",
+					tray: "custom",
+					tlang: "en_US",
+					presaveId: presave,
+					goteam_draft_only: 0,
+					isWide: 1,
+					collab: 0,
+					movieLid: 10,
+			                has_asset_char: "1",
+					nextUrl: "/html/list/movies.html",
+					tutorial: 1,
+				},
+				allowScriptAccess: "always",
+			};
+			break;
+		}
+
+		case "/videomaker/full/custom/tutorial?": {
+			let presave =
+				query.movieId && query.movieId.startsWith("m")
+					? query.movieId
+					: `m-${fUtil[query.noAutosave ? "getNextFileId" : "fillNextFileId"]("movie-", ".xml")}`;
+			title = "Video Editor";
+			attrs = {
+				data: process.env.SWF_URL + "/go_full.swf",
+				type: "application/x-shockwave-flash",
+				width: "100%",
+				height: "100%",
+			};
+			params = {
+				flashvars: {
+					apiserver: "/",
+					storePath: process.env.STORE_URL + "/<store>",
+					isEmbed: 1,
+					ctc: "go",
+					ut: 30,
+					bs: "default",
+					userId: 2152,
+			                m_mode: "Y",
+					appCode: "go",
+					page: "",
+					siteId: "go",
+					lid: 13,
+					isLogin: "Y",
+					retut: 0,
+					clientThemePath: process.env.CLIENT_URL + "/<client_theme>",
+					themeId: "custom",
+					tray: "custom",
+					tlang: "en_US",
+					presaveId: presave,
+					goteam_draft_only: 0,
+					isWide: 1,
+					collab: 0,
+					movieLid: 10,
+			                has_asset_char: "1",
 					nextUrl: "/html/list/movies.html",
 					tutorial: 1,
 				},
@@ -173,7 +264,7 @@ module.exports = function (req, res, url) {
 					apiserver: "/",
 					storePath: process.env.STORE_URL + "/<store>",
 					ut: 30,
-					autostart: 0,
+					autostart: 1,
 					isWide: 1,
 					clientThemePath: process.env.CLIENT_URL + "/<client_theme>",
 				},
