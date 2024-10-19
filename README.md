@@ -1,11 +1,9 @@
-# GoAnimate Wrapper
-This is an API wrapper for GoAnimate's Legacy Video Maker, which had been retired on *19th December 2019, 03:10 UTC*.	Unlike other services that attempt to sole the same problem, this project allows the LVM to access data peristence and is very portable.  Please keep in mind that not all features designed to run on the original API work properly.
-## How to Use
-To access this service, install [Node.JS](https://nodejs.org/en/) then clone/download this project.	Once done, unzip the folder, copy the path, and execute the following commands in your command prompt (where `{PATH}` is the folder path you copied):
-```console
-cd "{PATH}\GoAnimate-Wrapper-master"
-npm install
-npm start
-```
-**When done, go to your web browser and navigate to `localhost`.**
+# GoAnimate 3
+GoAnimate 3 is a clone of LinuxAnimate except it works on windows. THis is also requested by MKAnimates.
 
+## Limitations in the stable release.
+You cannot create your own characters besides uploading and deleting them. i know that this may sound curel to some. but if you want the ability to create characters, you must get GoAnimate 3 either from the goproduction channel or dev channel (dev channel is not recomended as it may be unstable) However, when you first get GoAnimate 3 from this channel, there will be some characters featured in the custom characters slot to start you off with making videos in windows. if you don't like some of those characters, then please click on the delete icon on the characters list and it will then be gone from the list in one click. if you like some of these characters, then please feel free to download them to use in goanimate online. If you are a goanimators, then it is recommended that you get GoAnimate 3 from the goproduction channel as it is alot more usable there.
+You also cannot save starters in GoAnimate 3 using this channel. i would say that there is no way to use the starters in the studio at all besides uploading them here for safekeeping.
+
+## Limitations in other releases.
+N/A
