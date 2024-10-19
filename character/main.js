@@ -1,18 +1,69 @@
+const cachéFolder = process.env.CACHÉ_FOLDER;
+const xNumWidth = process.env.XML_NUM_WIDTH;
 const baseUrl = process.env.CHAR_BASE_URL;
 const fUtil = require("../misc/file");
+const util = require("../misc/util");
 const get = require("../misc/get");
+const fw = process.env.FILE_WIDTH;
 const fs = require("fs");
 const themes = {};
-
-function generateId() {
-  return Math.random().toString(16).substring(2, 9);
-}
 
 function addTheme(id, buffer) {
 	const beg = buffer.indexOf(`theme_id="`) + 10;
 	const end = buffer.indexOf(`"`, beg);
 	const theme = buffer.subarray(beg, end).toString();
 	return (themes[id] = theme);
+}
+
+function save(id, data) {
+	const i = id.indexOf("-");
+	const prefix = id.substr(0, i);
+	const suffix = id.substr(i + 1);
+	switch (prefix) {
+		case "c":
+			fs.writeFileSync(fUtil.getFileIndex("char-", ".xml", suffix), data);
+			break;
+		case "C":
+	}
+	addTheme(id, data);
+	return id;
+}
+
+fUtil.getValidFileIndicies("char-", ".xml").map((n) => {
+	return addTheme(`c-${n}`, fs.readFileSync(fUtil.getFileIndex("char-", ".xml", n)));
+});
+
+/**
+ * @param {string} id
+ * @returns {string}
+ */
+function getCharPath(id) {
+	var i = id.indexOf("-");
+	var prefix = id.substr(0, i);
+	var suffix = id.substr(i + 1);
+	switch (prefix) {
+		case "c":
+			return fUtil.getFileIndex("char-", ".xml", suffix);
+		case "C":
+		default:
+			return `${cachéFolder}/char.${id}.xml`;
+	}
+}
+/**
+ * @param {string} id
+ * @returns {string}
+ */
+function getThumbPath(id) {
+	var i = id.indexOf("-");
+	var prefix = id.substr(0, i);
+	var suffix = id.substr(i + 1);
+	switch (prefix) {
+		case "c":
+			return fUtil.getFileIndex("char-", ".png", suffix);
+		case "C":
+		default:
+			return `${cachéFolder}/char.${id}.png`;
+	}
 }
 
 module.exports = {
@@ -23,7 +74,9 @@ module.exports = {
 	getTheme(id) {
 		return new Promise((res, rej) => {
 			if (themes[id]) res(themes[id]);
-			this.load(id).then((b) => res(addTheme(id, b))).catch(e => rej(e));
+			this.load(id)
+				.then((b) => res(addTheme(id, b)))
+				.catch(rej);
 		});
 	},
 	/**
@@ -32,16 +85,88 @@ module.exports = {
 	 */
 	load(id) {
 		return new Promise((res, rej) => {
-			try {
-        res(fs.readFileSync(`./chars/${id}.xml`));
-      } catch (e) {
-        // Blank prefix is left here for backwards-compatibility purposes.
-        const nId = (id.slice(0, -3) + "000").padStart(9, 0);
-				get(baseUrl + `/${nId}.txt`).then(chars => {
-          const line = chars.toString("utf8").split("\n").find((v) => v.substring(0, 3) == id.slice(-3));
-          if (line) res(Buffer.from(line.substring(3)));
-        });
+			var i = id.indexOf("-");
+			var prefix = id.substr(0, i);
+			var suffix = id.substr(i + 1);
+
+			switch (prefix) {
+				case "c":
+				case "C":
+					fs.readFile(getCharPath(id), (e, b) => {
+						if (e) {
+							var fXml = util.xmlFail();
+							rej(Buffer.from(fXml));
+						} else {
+							res(b);
+						}
+					});
+					break;
+
+				case "":
+				default: {
+					// Blank prefix is left here for backwards-compatibility purposes.
+					var nId = Number.parseInt(suffix);
+					var xmlSubId = nId % fw;
+					var fileId = nId - xmlSubId;
+					var lnNum = fUtil.padZero(xmlSubId, xNumWidth);
+					var url = `${baseUrl}/${fUtil.padZero(fileId)}.txt`;
+
+					get(url)
+						.then((b) => {
+							var line = b
+								.toString("utf8")
+								.split("\n")
+								.find((v) => v.substr(0, xNumWidth) == lnNum);
+							if (line) {
+								res(Buffer.from(line.substr(xNumWidth)));
+							} else {
+								rej(Buffer.from(util.xmlFail()));
+							}
+						})
+						.catch((e) => rej(Buffer.from(util.xmlFail())));
+				}
 			}
+		});
+	},
+	/**
+	 * @param {string} id
+	 * @returns {Promise<Buffer>}
+	 */
+	delete(id) {
+		return new Promise((res, rej) => {
+			var i = id.indexOf("-");
+			var prefix = id.substr(0, i);
+			var suffix = id.substr(i + 1);
+
+			switch (prefix) {
+				case "c":
+				case "C":
+					fs.unlinkSync(getCharPath(id), (e, b) => {
+						if (e) {
+							var fXml = util.xmlFail();
+							rej(Buffer.from(fXml));
+						} else {
+							res(b);
+						}
+					});
+					break;
+			}
+		});
+	},
+	/**
+	 * @param {string} id
+	 * @returns {Promise<Buffer>}
+	 */
+	deleteThumb(id) {
+		return new Promise((res, rej) => {
+			fs.unlinkSync(getThumbPath(id), (e, b) => {
+				if (e) {
+					var fXml = util.xmlFail();
+					rej(Buffer.from(fXml));
+				} else {
+					res(b);
+				}
+			});
 		});
 	},
 	/**
@@ -52,13 +177,19 @@ module.exports = {
 	save(data, id) {
 		return new Promise((res, rej) => {
 			if (id) {
-        fs.writeFileSync(`./chars/${id}.xml`, data);
-        res(id);
-      } else {
-        const newId = generateId();
-        fs.writeFileSync(`./chars/${newId}.xml`, data);
-        res(newId);
-      }
+				const i = id.indexOf("-");
+				const prefix = id.substr(0, i);
+				switch (prefix) {
+					case "c":
+					case "C":
+						fs.writeFile(getCharPath(id), data, (e) => (e ? rej() : res(id)));
+					default:
+						res(save(id, data));
+				}
+			} else {
+				saveId = `c-${fUtil.getNextFileId("char-", ".xml")}`;
+				res(save(saveId, data));
+			}
 		});
 	},
 	/**
@@ -67,10 +198,11 @@ module.exports = {
 	 * @returns {Promise<string>}
 	 */
 	saveThumb(data, id) {
-    fs.writeFileSync(`./chars/${id}.png`, data);
-	},
-  saveHead(data, id) {
-    fs.writeFileSync(`./heads/${id}.png`, data);
+		return new Promise((res, rej) => {
+			var thumb = Buffer.from(data, "base64");
+			fs.writeFileSync(getThumbPath(id), thumb);
+			res(id);
+		});
 	},
 	/**
 	 * @param {string} id
@@ -78,12 +210,37 @@ module.exports = {
 	 */
 	loadThumb(id) {
 		return new Promise((res, rej) => {
-			res(fs.readFileSync(`./chars/${id}.png`));
+			fs.readFile(getThumbPath(id), (e, b) => {
+				if (e) {
+					var fXml = util.xmlFail();
+					rej(Buffer.from(fXml));
+				} else {
+					res(b);
+				}
+			});
 		});
 	},
-  loadHead(id) {
-		return new Promise((res, rej) => {
-			res(fs.readFileSync(`./heads/${id}.png`));
+	meta(movieId) {
+		return new Promise(async (res, rej) => {
+			if (!movieId.startsWith("c-")) return;
+			const n = Number.parseInt(movieId.substr(2));
+			const fn = fUtil.getFileIndex("char-", ".xml", n);
+			
+			const fd = fs.openSync(fn, "r");
+			const buffer = fs.readFileSync(fUtil.getFileIndex("char-", ".xml", n));
+			fs.readSync(fd, buffer, 0, 256, 0);
+// i was going to also going to add that feature to other channels. but you guys can tell me on discord if i should do that or not first.
+			const tIDbeg = buffer.indexOf('" theme_id="') + 12;
+			const tIDend = buffer.indexOf('" x="');
+			const themeId = buffer.subarray(tIDbeg, tIDend).toString();
+
+			
+			fs.closeSync(fd);
+			res({
+				date: fs.statSync(fn).mtime,
+				id: movieId,
+				tId: themeId,
+			});
 		});
 	},
 };

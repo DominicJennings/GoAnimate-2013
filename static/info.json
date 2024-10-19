@@ -14,13 +14,6 @@
 			"statusCode": 302,
 			"content": ""
 		},
-		"/videomaker/full/tutorial?": {
-			"headers": {
-				"Location": "/go_full?tray=${match[1]}&tutorial=0"
-			},
-			"statusCode": 302,
-			"content": ""
-		},
 		"/business/videoplans": {
 			"headers": {
 				"Location": "https://github.com/josephanimate2021/wrapper-3-installer"
