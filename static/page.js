@@ -173,7 +173,7 @@ module.exports = function (req, res, url) {
 					apiserver: "/",
 					storePath: process.env.STORE_URL + "/<store>",
 					ut: 30,
-					autostart: 1,
+					autostart: 0,
 					isWide: 1,
 					clientThemePath: process.env.CLIENT_URL + "/<client_theme>",
 				},
