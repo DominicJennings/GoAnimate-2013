@@ -126,6 +126,7 @@ module.exports = function (req, res, url) {
 					isLogin: "Y",
 					retut: 1,
 					clientThemePath: process.env.CLIENT_URL + "/<client_theme>",
+					themeColor: "silver",					
 					themeId: "retro",
 					tray: "retro",
 					tlang: "en_US",
